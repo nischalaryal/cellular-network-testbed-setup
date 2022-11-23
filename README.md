@@ -31,7 +31,23 @@ pcsc_scan
 ```
 If the card reader is identified, the output of the command could be something like this.
 ```
-TODO: Add the result
+PC/SC device scanner
+V 1.5.2 (c) 2001-2017, Ludovic Rousseau <ludovic.rousseau@free.fr>
+Using reader plug'n play mechanism
+Scanning present readers...
+Waiting for the first reader...found one
+Scanning present readers...
+0: Gemalto USB Shell Token V2 (64438828) 00 00
+
+...
+...
+...
+
+Possibly identified card (using /usr/share/pcsc/smartcard_list.txt):
+3B 9F 96 80 1F C7 80 31 A0 73 BE 21 13 67 43 20 07 18 00 00 01 A5
+	sysmoUSIM-SJS1 (Telecommunication)
+	http://www.sysmocom.de/products/sysmousim-sjs1-sim-usim
+
 ```
 
 3. Next, we need following information to program into the sim card. 
@@ -39,19 +55,49 @@ TODO: Add the result
 
 | Variable | Description | Value Used |
 | --- | --- | --- |
-| `ADM` | Administrative key for SIM card. Provided during purchase. VERY IMPORTANT. | 2611488 |
-| `MCC` | Mobile Country Code | 208 |
-| `MNC` | Mobile Network Code | 93 |
-| `Name` | Name of SIM card shown on the phone. | Magic |
-| `IMSI` | International Mobile Subscriber Identity | 208930000000008 |
-| `Ki` | Authentication Key | 8baf473f2f8fd09487cccbd7097c6862 |
-| `OPC` | Operator Authentication Key | 2117cd3f66beb0811e6c72bc9ba82b3a |
+| `pin-adm` | Administrative key for SIM card. Provided during purchase. VERY IMPORTANT. | 2611488 |
+| `mcc` | Mobile Country Code | 208 |
+| `mnc` | Mobile Network Code | 93 |
+| `pcsc-device` | Which PC/SC reader number for SIM access. | 0 or 1 |
+| `imsi` | International Mobile Subscriber Identity | 208930000000008 |
+| `ki` | Authentication Key | 8baf473f2f8fd09487cccbd7097c6862 |
+| `opc` | Operator Authentication Key | 2117cd3f66beb0811e6c72bc9ba82b3a |
+| `acc` | Access Control Code | 0010 |
+| `dry-run` | Perform a 'dry run', don't actually program the card | - |
 
 **Note: The MCC and MNC values need to exactly match in the eNodeB configuration file and the core network. Ki and OPC values need to match exactly with the values stored in core network for successful attachment of UE.**
 
 4. Once all the values are ready, we program the SIM card using pysim.
 ```
-TODO: Add code
+./pySim-prog.py --pcsc-device=0 \
+                --type="sysmoUSIM-SJS1" \ 
+                --mcc=208 \
+                --mnc=93 \
+                --imsi=208930000000008 \
+                --opc=2117cd3f66beb0811e6c72bc9ba82b3a \
+                --ki=8baf473f2f8fd09487cccbd7097c6862 \
+                --iccid=8988211000000285844 \
+                --pin-adm=73497301 \
+                --acc=0010 \
+                --dry-run
+```
+
+Upon success, you will get output like this. Once you are satisfied with the values, remove ```dry-run``` to actually program the card.
+```
+Using PC/SC reader interface
+Generated card parameters :
+ > Name     : Magic
+ > SMSP     : e1ffffffffffffffffffffffff0581005155f5ffffffffffff000000
+ > ICCID    : 8988211000000285844
+ > MCC/MNC  : 208/93
+ > IMSI     : 208930000000008
+ > Ki       : 2117cd3f66beb0811e6c72bc9ba82b3a
+ > OPC      : 8e27b6af0e692e750f32667a3b14605d
+ > ACC      : 0010
+ > ADM1(hex): 3733343937333031
+ > OPMODE   : None
+Dry Run: NOT PROGRAMMING!
+Programming successful: Remove card from reader
 ```
 
 5. Finally, we setup APN value which will be used for setting up internet access. Go to your mobile data option in settings. Search for Access Point Names (APN) option and add a new apn setting with ```Name``` as ```oai``` and ```APN``` value ```oai.ipv4```. The name can be according to your choice as long as it matches with the value stored in core network.
@@ -60,7 +106,7 @@ TODO: Add code
 Ran setup
 
 ## OAI Core Netowrk Setup
-oai ran
+oai core
 
 ## Magma Core Network Setup
 magma core
