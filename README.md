@@ -459,6 +459,7 @@ TODO: Add code
 sudo ip route add 192.168.2.0/24 via 192.168.60.142 dev eth1
 ```
 
+**Note**: At last, we can ping each system to check if the route is working correctly or not.
 
 
 
