@@ -355,7 +355,12 @@ sudo ./cmake_targets/lte_build_oai/build/lte-softmodem -O ~/enb2/ci-scripts/conf
 
 
 ## OAI Core Netowrk Setup
-oai core
+For implementing core network, we utilized the OAI evolved packet core [repository](https://github.com/OPENAIRINTERFACE/openair-epc-fed). The documentation provided there is easy to follow. However, here we list the process we did for successful installation and build.
+
+1. We installed the [pre-requisites](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/DEPLOY_PRE_REQUESITES_MAGMA.md)
+2. Clone and build the required [versions](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/BUILD_IMAGES_MAGMA_MME.md).
+3. Build and run the [containers](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md). Especially, pay attention to [Section 4](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md#4-how-to-edit-the-docker-compose-file) which provides information for modifying the required parameters.
+4. If we are implementing eNodeB and core netowrk in different system, we need to setup a route for the two systems to communicate. Please check this [link](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/CONFIGURE_NETWORKS_MAGMA.md#step-2-create-a-route-on-your-enbgnb-servers). After setting up route, we can ping to check if the setup was successful or not.
 
 ## Magma Core Network Setup
 magma core
