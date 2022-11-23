@@ -363,4 +363,56 @@ For implementing core network, we utilized the OAI evolved packet core [reposito
 4. If we are implementing eNodeB and core netowrk in different system, we need to setup a route for the two systems to communicate. Please check this [link](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/CONFIGURE_NETWORKS_MAGMA.md#step-2-create-a-route-on-your-enbgnb-servers). After setting up route, we can ping to check if the setup was successful or not.
 
 ## Magma Core Network Setup
-magma core
+For deploying Magma core network, we utilized the [v1.8.0](https://magma.github.io/magma/docs/basics/introduction.html) documentation. Like OAI-CN, the documentation in this site is sufficient to run all the functionalities of the core. However, we will mention the required steps we took for a successfull build and run.
+
+### Pre-requisties
+We installed the [pre-requisites](https://magma.github.io/magma/docs/basics/prerequisites). **Note**: Pay special attention to the python and golang version as failure to comply to the version might create issues during next steps. We skipped the Deployment Tooling from this page since our goal was not to deploy in real-world testbed.
+
+### AGW Deployment
+```
+[HOST]$ echo "* 192.168.0.0/16" | sudo tee -a /etc/vbox/networks.conf
+[HOST]$ cd magma/lte/gateway/
+#  Create VM that will host the access gateway (5-10 min):
+[HOST]$ vagrant up magma
+#  Complete the installation of access gateway on the VM:
+[HOST]$ vagrant ssh magma
+[AGW]~$ cd magma/lte/gateway
+#  Compile the source code (up to 30-40 min for first run):
+[AGW]$ make run
+#  Restart magma services:
+[AGW]$ sudo service magma@* stop
+[AGW]$ sudo service magma@magmad start 
+#  Check magma services:
+[AGW]$ sudo service magma@* status
+```
+
+### Orchestrator Deployment
+```
+[HOST]$ cd magma/orc8r/cloud/docker
+#  Build orc8r images (can take up to 30-60 min for first time):
+[HOST]$ ./build.py –all
+#  Run orc8r docker services (--metrics is optional):
+[HOST]$ ./run.py [--metrics]
+#  Check dockers status
+[HOST]$ docker-compose ps
+```
+**Note**: After the orchestrator deployment, we need to add the certificate files to the browser (Firefox in our case) in order to access APIs. The process to add the certificate is given [here](https://magma.github.io/magma/docs/basics/quick_start_guide). 
+
+### NMS Deployment
+```
+HOST [magma]$ cd nms
+HOST [magma/nms] $ COMPOSE_PROJECT_NAME=magmalte docker-compose build magmalte
+HOST [magma/nms] $ docker-compose up -d
+HOST [magma/nms] $ ./scripts/dev_setup.sh
+```
+
+### Connecting AGW and Orchestrator
+```
+HOST [magma]$ cd lte/gateway
+HOST [magma/lte/gateway]$ fab -f dev_tools.py register_vm
+```
+
+### Configuration Parameters
+After successfully running all the code above, the configuration parameters and subscriber can be added through the NMS [website](https://magma-test.localhost/) using ```username=admin@magma.test``` and ```password=password123```.
+
+### [IMPORTANT] SETTING UP ROUTES
