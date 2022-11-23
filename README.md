@@ -1,7 +1,13 @@
-# LTE Testbed SETUP Using OpenAirInterface and Magma Core
-Some line...
+# LTE Testbed setup Using OpenAirInterface and Magma Core
+In this repository, we have described the setup procedure we followed to setup an E2E LTE cellular network testbed using COTS UE, programmable SIM card, OpenAirInterface (for RAN and Core functionality), and Magma Core software. Configuration files have also been added to this repository for reference purposes.
 
-## UE SETUP
+This setup procedure is divided into 4 parts:
+1. **UE Setup** where we program the SIM card with appropriate values.
+2. **RAN setup** where we use OpenAirInterface and USRP (with UHD) to prepare EnodeB
+3. **Core setup** where we use OpenAirInterface core network and Magma Core to setup two different LTE core.
+4. **Routing** where we define routes to communicate between two systems (RAN system and Core system).
+
+## 1. UE SETUP
 Following devices and softwares were used for setting up a Commercially Off-The Shelf (COTS) User equipment.
 - Hardware
   - Samsung Galaxy S4
@@ -102,7 +108,9 @@ Programming successful: Remove card from reader
 
 5. Finally, we setup APN value which will be used for setting up internet access. Go to your mobile data option in settings. Search for Access Point Names (APN) option and add a new apn setting with ```Name``` as ```oai``` and ```APN``` value ```oai.ipv4```. The name can be according to your choice as long as it matches with the value stored in core network.
 
-## OAI RAN SETUP
+
+
+## 2. RAN SETUP
 **Note:** For setting up RAN, **[system](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSystemRequirements) and [kernel](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirKernelMainSetup) requirements** are very important. So it is important to properly go through the requirements from the [OAI webpage](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSoftwareSupport).
 
 ### Hardware
@@ -309,7 +317,7 @@ Search for following code snippets and change the mcc and mnc values
 plmn_list = ( { mcc = 208; mnc = 93; mnc_length = 2;} );
 ```
 
-_192.168.61.149_ is the ip address of the system where our **_MME_** was installed.
+_192.168.61.149_ is the ip address of the system where our **core network** was installed. **Note:** Since our OAI core will be deployed in docker, the IP address used here will be of the core network host system. But for magma core, access gateway will be deployed in virtual machine, so the IP will be of the virtual machine (Most probably, _192.168.61.149_).
 ```
 mme_ip_address      = ( { ipv4       = "192.168.61.149";
                               ipv6       = "192:168:30::17";
@@ -318,7 +326,7 @@ mme_ip_address      = ( { ipv4       = "192.168.61.149";
                             }
                           );
 ```
-_192.168.1.215_ is the ip address of the system where our **_enb_** was set up. **_eno1_** is the interface name of the same system. You can see these values by running the _ifconfig_ command.
+_192.168.1.215_ is the ip address of the system where our **RAN** was set up (i.e., the same system where you will be opening this file). **_eno1_** is the interface name of the same system. You can see these values by running the _ifconfig_ command.
 ```
 NETWORK_INTERFACES :
     {
@@ -346,7 +354,7 @@ Build OAI
 
 ./build_oai --eNB -w USRP
 ```
-After successful build, connect the USRP and run the enb. **Note**: Based on software version, the binary gets built in different folder. We need to pay attention to the folder where the binary is being built.
+After successful build, connect the USRP and run the enb. **Note**: Based on software version, the binary gets built in different folder. We need to pay attention to the folder where the binary is being built. For v1.1.0, it had he following path (i.e., _/cmake_targets/lte_build_oai/build/_)
 
 ```
 sudo ./cmake_targets/lte_build_oai/build/lte-softmodem -O ~/enb2/ci-scripts/conf_files/enb.band7.tm1.50PRB.usrpb210.conf
@@ -354,7 +362,10 @@ sudo ./cmake_targets/lte_build_oai/build/lte-softmodem -O ~/enb2/ci-scripts/conf
 **Note:** After running enb, if you face overflow issues with a lot of L and U, check the software requirements again. If you still have this issue, then your hardware requirement is not met. You need the latest hardware. Check the hardware section.
 
 
-## OAI Core Netowrk Setup
+## 3. Core Setup
+
+### 3.1 OpenAirInterface Core Setup
+
 For implementing core network, we utilized the OAI evolved packet core [repository](https://github.com/OPENAIRINTERFACE/openair-epc-fed). The documentation provided there is easy to follow. However, here we list the process we did for successful installation and build.
 
 1. We installed the [pre-requisites](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/DEPLOY_PRE_REQUESITES_MAGMA.md)
@@ -362,7 +373,8 @@ For implementing core network, we utilized the OAI evolved packet core [reposito
 3. Build and run the [containers](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md). Especially, pay attention to [Section 4](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md#4-how-to-edit-the-docker-compose-file) which provides information for modifying the required parameters.
 4. If we are implementing eNodeB and core netowrk in different system, we need to setup a route for the two systems to communicate. Please check this [link](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/CONFIGURE_NETWORKS_MAGMA.md#step-2-create-a-route-on-your-enbgnb-servers). After setting up route, we can ping to check if the setup was successful or not.
 
-## Magma Core Network Setup
+
+### 3.2 Magma Core Network Setup
 For deploying Magma core network, we utilized the [v1.8.0](https://magma.github.io/magma/docs/basics/introduction.html) documentation. Like OAI-CN, the documentation in this site is sufficient to run all the functionalities of the core. However, we will mention the required steps we took for a successfull build and run.
 
 ### Pre-requisties
@@ -415,4 +427,45 @@ HOST [magma/lte/gateway]$ fab -f dev_tools.py register_vm
 ### Configuration Parameters
 After successfully running all the code above, the configuration parameters and subscriber can be added through the NMS [website](https://magma-test.localhost/) using ```username=admin@magma.test``` and ```password=password123```.
 
-### [IMPORTANT] SETTING UP ROUTES
+## 4. Routing
+Establishing a proper route will be very important when implementing RAN and core network in separate system. The two systems need to identify eachother in order to exchange data. Routing setup is different according to the core network used (OAI or Magma).
+
+### 4.1 Route for RAN and OAI Core
+In this scenario, RAN (with IP = _192.168.2.215_) and OAI core (with IP = _192.168.2.171_) are on the same network. So, we setup a route in the RAN system using the following command.
+```
+sudo ip route add 192.168.61.128/26 via 192.168.2.171 dev eno1
+```
+where
+- 192.168.2.171 is the **IP address** of the **system where OAI core** is deployed.
+- eno1 is the **Network Interface Controller(NIC)** of the system where RAN is deployed.
+
+To understand this code, it is similar to saying **_In order to access the IP range 192.168.61.128/26, contact IP address 192.168.2.171 using interface eno1_**.
+
+### 4.2 Route for RAN and Magma Core
+Setting up routes for RAN and Magma core is a bit challenging because the Access Gateway (AGW) is located inside the virtual machine. So we need to add routes on 3 different systems: **RAN system, Magma system,** and **AGW virtual machine**.
+
+#### 4.2.1 RAN System
+This step is similar to the previous one.
+```
+sudo ip route add 192.168.60.0/24 via 192.168.2.171 dev eno1
+```
+#### 4.2.2 Magma Core System
+```
+TODO: Add code
+```
+
+#### 4.2.3 AGW virtual machine
+```
+sudo ip route add 192.168.2.0/24 via 192.168.60.142 dev eth1
+```
+
+
+
+
+
+
+
+
+
+
+
