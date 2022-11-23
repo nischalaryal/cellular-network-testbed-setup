@@ -461,8 +461,17 @@ sudo ip route add 192.168.2.0/24 via 192.168.60.142 dev eth1
 
 **Note**: At last, we can ping each system to check if the route is working correctly or not.
 
+Example:
+```
+# [For Magma setup] from RAN system, ping to AGW
+ping 192.168.60.142
 
+# You can also try to ping from AGW to RAN
+ping 192.168.2.215
 
+# [For OAI setup] from RAN system, ping to OAI core
+ping 192.168.61.149
+```
 
 
 
