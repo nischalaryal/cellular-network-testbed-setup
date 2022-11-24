@@ -793,4 +793,11 @@ ping 192.168.61.149
 
 Coming Soon...
 
+# References
+- [OAI RAN](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSoftwareSupport)
+- [Kernal Help](https://daobook.github.io/apollo/docs/howto/how_to_install_apollo_kernel.html)
+- [Kernal Help](https://super-unix.com/ubuntu/ubuntu-disable-ondemand-cpu-scaling-daemon/)
+- [UHD](https://kb.ettus.com/Building_and_Installing_the_USRP_Open-Source_Toolchain_(UHD_and_GNU_Radio)_on_Linux)
+- [OAI Core](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/DEPLOY_HOME_MAGMA_MME.md)
+- [Magma Core](https://magma.github.io/magma/docs/basics/introduction.html)
 
