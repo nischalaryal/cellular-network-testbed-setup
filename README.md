@@ -514,7 +514,7 @@ oai-spgwu-tiny          production             588e14481f2b        1 minute ago 
  ```
  docker logs demo-cassandra
  ```
- Output should be have the following line at last. If no, execute ```docker-compose down``` and start again from cassandra.
+ Output should be have the following line at last. If no, execute ```docker-compose down``` and start again from initializing cassandra.
  ```
  ....
  INFO  20:19:40 Initializing vhss.extid_imsi_xref
@@ -541,7 +541,59 @@ oai-spgwu-tiny          production             588e14481f2b        1 minute ago 
 For deploying Magma core network, we utilized the [v1.8.0](https://magma.github.io/magma/docs/basics/introduction.html) documentation. Like OAI-CN, the documentation in this site is sufficient to run all the functionalities of the core. However, we will mention the required steps we took for a successfull build and run.
 
 ### Pre-requisties
-We installed the [pre-requisites](https://magma.github.io/magma/docs/basics/prerequisites). **Note**: Pay special attention to the python and golang version as failure to comply to the version might create issues during next steps. We skipped the Deployment Tooling from this page since our goal was not to deploy in real-world testbed.
+First, we installed the [pre-requisites](https://magma.github.io/magma/docs/basics/prerequisites). We used ```UBUNTU 20.04``` operating system for Magma deployment.
+**Note**: Pay special attention to the python and golang version as failure to comply to the version might create issues during next steps. We skipped the Deployment Tooling from this page since our goal was not to deploy in real-world testbed.
+
+1. Go Lang
+```
+# Download and extract Go Lang
+wget https://artifactory.magmacore.org/artifactory/generic/go1.18.3.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz
+
+# Setup PATH variable
+echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
+source .bashrc
+
+# Verify proper install
+go version
+# Output should be something like 'go version go1.18.3 linux/amd64'
+```
+2. Pyenv
+```
+# Install necessary dependencies
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+
+# Clone pyenv repo in _.pyenv_ folder
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+
+# Configure .bashrc for pyenv variables
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -) "\nfi' >> ~/.bashrc
+exec "$SHELL"
+
+# Install pyenv according to your requirement. For us, it was 3.8.10
+pyenv install 3.8.10
+pyenv global 3.8.10
+```
+
+3. Download [docker](https://docs.docker.com/engine/install/ubuntu/), [docker-compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04), [virtual box](https://www.virtualbox.org/wiki/Linux_Downloads), and [vagrant](https://linuxize.com/post/how-to-install-vagrant-on-ubuntu-20-04/) from their own website (Here we have provided the ones we followed. Official and other sites). It is better to keep these program in their latest version and according to the OS requirement. After successfully installing vagrant, install the following plugins.
+```
+vagrant plugin install vagrant-vbguest vagrant-disksize vagrant-reload
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### AGW Deployment
 ```
