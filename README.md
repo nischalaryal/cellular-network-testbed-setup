@@ -623,17 +623,82 @@ sudo service magma@magmad start
 sudo service magma@* status
 ```
 
+
+
+
+
+
+
 ### Orchestrator Deployment
+We will deploy the Orchestrator in docker containers in **[HOST]**
+1. Access the following path
 ```
-[HOST]$ cd magma/orc8r/cloud/docker
-#  Build orc8r images (can take up to 30-60 min for first time):
-[HOST]$ ./build.py –all
-#  Run orc8r docker services (--metrics is optional):
-[HOST]$ ./run.py [--metrics]
-#  Check dockers status
-[HOST]$ docker-compose ps
+cd magma/orc8r/cloud/docker
 ```
-**Note**: After the orchestrator deployment, we need to add the certificate files to the browser (Firefox in our case) in order to access APIs. The process to add the certificate is given [here](https://magma.github.io/magma/docs/basics/quick_start_guide). 
+
+2. Build orchestrator images in **[HOST]** system.
+```
+./build.py --all
+```
+
+3. Run orchestrator services in **[HOST]** system.
+```
+./run.py --metrics
+```
+OUTPUT:
+```
+Creating orc8r_postgres_1 ... done
+Creating orc8r_test_1     ... done
+Creating orc8r_maria_1    ... done
+Creating elasticsearch    ... done
+Creating fluentd          ... done
+Creating orc8r_kibana_1   ... done
+Creating orc8r_proxy_1      ... done
+Creating orc8r_controller_1 ... done
+```
+4. Check dockers status in **[HOST]** system.
+```
+docker-compose ps
+```
+OUTPUT:
+```
+Creating orc8r_alertmanager_1     ... done
+Creating orc8r_maria_1            ... done
+Creating elasticsearch            ... done
+Creating orc8r_postgres_1         ... done
+Creating orc8r_config-manager_1   ... done
+Creating orc8r_test_1             ... done
+Creating orc8r_prometheus-cache_1 ... done
+Creating orc8r_prometheus_1       ... done
+Creating orc8r_kibana_1           ... done
+Creating fluentd                  ... done
+Creating orc8r_proxy_1            ... done
+Creating orc8r_controller_1       ... done
+```
+
+**Note**: After the orchestrator deployment, we need to add the certificate files to the browser (Firefox in our case) in order to access APIs. The process to add the certificate is given [here](https://magma.github.io/magma/docs/basics/quick_start_guide).
+
+- Access the following path in **[HOST]** system to see the keys.
+```
+ls ~/magma/.cache/test_certs
+```
+OUTPUT:
+```
+admin_operator.key.pem  bootstrapper.key        controller.crt          rootCA.key
+admin_operator.pem      certifier.key           controller.csr          rootCA.pem
+admin_operator.pfx      certifier.pem           controller.key          rootCA.srl
+```
+
+- Since we are using _Firefox_ browser, we imported this _admin_operator.pfx_ file into your browser's installed client certificates. See [here](https://support.globalsign.com/digital-certificates/digital-certificate-installation/install-client-digital-certificate-firefox-windows) for instructions. The ```passwrod``` is ```magma``` for the file.
+
+
+### Connecting AGW and Orchestrator
+After successfully building and running AGW and orchestrator, we need to connect these two components. The following code is executed in the **[HOST]** system
+```
+cd ~/magma/lte/gateway
+fab -f dev_tools.py register_vm
+```
+
 
 ### NMS Deployment
 ```
@@ -643,14 +708,20 @@ HOST [magma/nms] $ docker-compose up -d
 HOST [magma/nms] $ ./scripts/dev_setup.sh
 ```
 
-### Connecting AGW and Orchestrator
-```
-HOST [magma]$ cd lte/gateway
-HOST [magma/lte/gateway]$ fab -f dev_tools.py register_vm
-```
 
 ### Configuration Parameters
 After successfully running all the code above, the configuration parameters and subscriber can be added through the NMS [website](https://magma-test.localhost/) using ```username=admin@magma.test``` and ```password=password123```.
+
+
+
+
+
+
+
+
+
+
+
 
 ## 4. Routing
 Establishing a proper route will be very important when implementing RAN and core network in separate system. The two systems need to identify eachother in order to exchange data. Routing setup is different according to the core network used (OAI or Magma).
