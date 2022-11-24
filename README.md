@@ -730,16 +730,8 @@ docker-compose up -d
 
 After successfully running all the code above, the configuration parameters and subscriber can be added through the NMS [website](https://magma-test.localhost/).
 - Use ```username=admin@magma.test``` and ```password=password123``` to access NMS dashboard.
-
-
-
-
-
-
-
-
-
-
+- Use the ```Network``` section to update **MCC** and **MNC** values of the system. This should match the value stored in EnodeB configuration file and in SIM card. After this step, you should be able to successfully connect RAN and Core.
+- Use the ```Subscriber``` section to add the subscriber with the information mentioned in the UE section. After this, you can successfully connect UE to the network. **NOTE**: If you see authentication error, there is a high chance you have your **OPC** and/or **Ki** keys not matching in **AGW** and **UE**. 
 
 
 ## 4. Routing
