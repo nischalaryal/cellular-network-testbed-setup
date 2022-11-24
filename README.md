@@ -668,13 +668,12 @@ sudo iptables -P FORWARD ACCEPT
 ```
 #### 4.2.2 Magma Core System
 ```
-Sudo sysctl net.ipv4.conf.all.forwarding=1
-Sudo iptables -P FORWARD ACCEPT
-Sudo iptables -A FORWARD -i vboxnet0 -o eno1 -j ACCEPT
-Sudo iptables -A FORWARD -i vboxnet0 -o eno1 -m state --state ESTABLISHED,RELATED -j ACCEPT
-Sudo iptables -t nat -A POSTROUTING -o vboxnet0 -j MASQUERADE
-Sudo iptables -A FORWARD -i eno1 -o vboxnet0 -j ACCEPT
-
+sudo sysctl net.ipv4.conf.all.forwarding=1
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -A FORWARD -i vboxnet0 -o eno1 -j ACCEPT
+sudo iptables -A FORWARD -i vboxnet0 -o eno1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -t nat -A POSTROUTING -o vboxnet0 -j MASQUERADE
+sudo iptables -A FORWARD -i eno1 -o vboxnet0 -j ACCEPT
 ```
 
 #### 4.2.3 AGW virtual machine
