@@ -581,36 +581,46 @@ pyenv global 3.8.10
 ```
 vagrant plugin install vagrant-vbguest vagrant-disksize vagrant-reload
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
+4. Download Magma
+```
+git clone https://github.com/magma/magma.git
+cd magma
+git checkout v1.8
+```
 
 ### AGW Deployment
+For AGW, we will use virtualbox for creating the OS for deployment. So, from this section **[HOST]** means the main system where we installed everything. **[AGW]** means the virtual OS inside virtualbox
+
+1. Setting up network configuration in the **[HOST]** system
 ```
-[HOST]$ echo "* 192.168.0.0/16" | sudo tee -a /etc/vbox/networks.conf
-[HOST]$ cd magma/lte/gateway/
-#  Create VM that will host the access gateway (5-10 min):
-[HOST]$ vagrant up magma
-#  Complete the installation of access gateway on the VM:
-[HOST]$ vagrant ssh magma
-[AGW]~$ cd magma/lte/gateway
-#  Compile the source code (up to 30-40 min for first run):
-[AGW]$ make run
-#  Restart magma services:
-[AGW]$ sudo service magma@* stop
-[AGW]$ sudo service magma@magmad start 
-#  Check magma services:
-[AGW]$ sudo service magma@* status
+echo "* 192.168.0.0/16" | sudo tee -a /etc/vbox/networks.conf
+cd magma/lte/gateway/
+```
+
+2. Create VM that will host the access gateway in **[HOST]** system.
+```
+vagrant up magma
+```
+3. After completing the previous command, access the virtual environment from the **[HOST]** system.
+```
+vagrant ssh magma
+```
+4. Now you are in the **[AGW]** system. Go to the following path.
+```
+cd ~/magma/lte/gateway
+```
+5. Compile the source code in **[AGW]**.
+```
+make run
+```
+6. Restart magma services in **[AGW]** machine
+```
+sudo service magma@* stop
+sudo service magma@magmad start 
+```
+7. Check magma services are **active** or not in **[AGW]**.
+```
+sudo service magma@* status
 ```
 
 ### Orchestrator Deployment
