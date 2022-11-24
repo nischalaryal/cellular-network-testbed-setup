@@ -793,6 +793,9 @@ ping 192.168.61.149
 
 Coming Soon...
 
+# Publication
+This work was presented as a DEMO paper titled _"Private Cellular Network Deployment: Comparison of OpenAirInterface with Magma Core"_ in CNSM 2022, Thessaloniki, Greece. Paper can be accessed from [here](https://www.researchgate.net/publication/365705123_Private_Cellular_Network_Deployment_Comparison_of_OpenAirInterface_with_Magma_Core).
+
 # References
 - [OAI RAN](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSoftwareSupport)
 - [Kernal Help](https://daobook.github.io/apollo/docs/howto/how_to_install_apollo_kernel.html)
