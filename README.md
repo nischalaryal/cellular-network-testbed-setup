@@ -689,28 +689,47 @@ admin_operator.pem      certifier.key           controller.csr          rootCA.p
 admin_operator.pfx      certifier.pem           controller.key          rootCA.srl
 ```
 
-- Since we are using _Firefox_ browser, we imported this _admin_operator.pfx_ file into your browser's installed client certificates. See [here](https://support.globalsign.com/digital-certificates/digital-certificate-installation/install-client-digital-certificate-firefox-windows) for instructions. The ```passwrod``` is ```magma``` for the file.
+- Since we are using _Firefox_ browser, we imported this _admin_operator.pfx_ file into your browser's installed client certificates. See [here](https://support.globalsign.com/digital-certificates/digital-certificate-installation/install-client-digital-certificate-firefox-windows) for instructions. The ```passwrod``` is ```magma``` for the pfx file.
+- After adding the pfx file, you can access the [SWAGGER API](https://localhost:9443/swagger/v1/ui).
 
 
 ### Connecting AGW and Orchestrator
-After successfully building and running AGW and orchestrator, we need to connect these two components. The following code is executed in the **[HOST]** system
+After successfully building and running AGW and orchestrator, we need to connect these two components. The following code is executed in the **[HOST]** system. You will get a success message after proper connection.
 ```
 cd ~/magma/lte/gateway
 fab -f dev_tools.py register_vm
 ```
 
+After success message, access **[AGW]** machine and run the following code to see the success message in AGW.
+```
+# This is executed in [HOST] machine
+vagrant ssh magma
+
+# The following code are executed in [AGW] machine.
+sudo service magma@* stop
+sudo service magma@magmad restart
+sudo tail -f /var/log/syslog
+```
+OUTPUT:
+```
+Sep 27 22:57:35 magma-dev magmad[6226]: [2018-09-27 22:57:35,550 INFO root] Checkin Successful!
+Sep 27 22:57:55 magma-dev magmad[6226]: [2018-09-27 22:57:55,684 INFO root] Processing config update g1
+Sep 27 22:57:55 magma-dev control_proxy[6418]: 2018-09-27T22:57:55.683Z [127.0.0.1 -> streamer-controller.magma.test,8443] "POST /magma.Streamer/GetUpdates HTTP/2" 200 7bytes 0.009s
+```
 
 ### NMS Deployment
+NMS provides UI for configuring and monitoring the network. We use following code to build NMS and connect with orchestrator. This is executed in **[HOST]** system.
 ```
-HOST [magma]$ cd nms
-HOST [magma/nms] $ COMPOSE_PROJECT_NAME=magmalte docker-compose build magmalte
-HOST [magma/nms] $ docker-compose up -d
-HOST [magma/nms] $ ./scripts/dev_setup.sh
+cd ~/magma/nms
+COMPOSE_PROJECT_NAME=magmalte docker-compose build magmalte
+docker-compose up -d
+
+# After 1-2 minute, execute this command.
+./scripts/dev_setup.sh
 ```
 
-
-### Configuration Parameters
-After successfully running all the code above, the configuration parameters and subscriber can be added through the NMS [website](https://magma-test.localhost/) using ```username=admin@magma.test``` and ```password=password123```.
+After successfully running all the code above, the configuration parameters and subscriber can be added through the NMS [website](https://magma-test.localhost/).
+- Use ```username=admin@magma.test``` and ```password=password123``` to access NMS dashboard.
 
 
 
