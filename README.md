@@ -362,16 +362,179 @@ sudo ./cmake_targets/lte_build_oai/build/lte-softmodem -O ~/enb2/ci-scripts/conf
 **Note:** After running enb, if you face overflow issues with a lot of L and U, check the software requirements again. If you still have this issue, then your hardware requirement is not met. You need the latest hardware. Check the hardware section.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 3. Core Setup
+Here we will discuss about implementing 2 different core network setup.
+- OpenAirInterface Core Setup
+- Magma Core Setup
 
 ### 3.1 OpenAirInterface Core Setup
 
-For implementing core network, we utilized the OAI evolved packet core [repository](https://github.com/OPENAIRINTERFACE/openair-epc-fed). The documentation provided there is easy to follow. However, here we list the process we did for successful installation and build.
+For implementing OAI core network, we utilized the OAI evolved packet core [repository](https://github.com/OPENAIRINTERFACE/openair-epc-fed). The documentation provided there is easy to follow. However, here we list the process we did for successful installation and build.
 
 1. We installed the [pre-requisites](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/DEPLOY_PRE_REQUESITES_MAGMA.md)
-2. Clone and build the required [versions](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/BUILD_IMAGES_MAGMA_MME.md).
-3. Build and run the [containers](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md). Especially, pay attention to [Section 4](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md#4-how-to-edit-the-docker-compose-file) which provides information for modifying the required parameters.
-4. If we are implementing eNodeB and core netowrk in different system, we need to setup a route for the two systems to communicate. Please check this [link](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/CONFIGURE_NETWORKS_MAGMA.md#step-2-create-a-route-on-your-enbgnb-servers). After setting up route, we can ping to check if the setup was successful or not.
+	- **Ubuntu 18.04** was used as the Operating System.
+	- **Docker** (version ```5:20.10.2~3-0~ubuntu-bionic```) and **docker-compose** (version ```1.27```) were installed from their main website and following code was executed to add docker to sudo group.
+	 ```
+	 sudo usermod -a -G docker <<username of system where Core is being deployed>>
+	 ```
+	- We then need to pull 3 base images from ```docker hub```: ```ubuntu:bionic```, ```cassandra:2.1``` and ```redis:6.0.5```.
+	  ```
+	  docker login
+	  Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+	  Username: 
+	  Password: 
+	  ```
+	  ```
+	  docker pull ubuntu:bionic
+	  docker pull cassandra:2.1
+	  docker pull redis:6.0.5
+	  ```
+	  ```
+	  docker logout
+	  ```
+
+2. Clone the required [versions](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docs/BUILD_IMAGES_MAGMA_MME.md). For our setup, we opted for the stable version (i.e. ```master``` branch).
+```
+# Clone directly on the latest release tag
+git clone --branch v1.2.0 https://github.com/OPENAIRINTERFACE/openair-epc-fed.git
+cd openair-epc-fed
+
+# If you forgot to clone directly to the latest release tag
+git checkout -f v1.2.0
+
+# Synchronize all git submodules
+./scripts/syncComponents.sh
+---------------------------------------------------------
+OAI-HSS    component branch : master
+OAI-SPGW-C component branch : master
+OAI-SPGW-U component branch : master
+```
+
+
+3. Build the modules.
+ - Build HSS
+```
+docker build --target oai-hss --tag oai-hss:production \
+               --file component/oai-hss/docker/Dockerfile.ubuntu18.04 \
+               component/oai-hss
+```
+```
+docker image prune --force
+```
+```
+docker image ls
+#OUTPUT
+oai-hss                 production             f478bafd7a06        1 minute ago          341MB
+...
+```
+
+ - Build SPGW-C
+```
+docker build --target oai-spgwc --tag oai-spgwc:production --file component/oai-spgwc/docker/Dockerfile.ubuntu18.04 component/oai-spgwc
+```
+```
+docker image prune --force
+```
+```
+docker image ls
+#OUTPUT
+oai-spgwc               production             b1ba7dd16bc5        1 minute ago          218MB
+...
+```
+
+ - Build SPGW-U
+```
+docker build --target oai-spgwu-tiny --tag oai-spgwu-tiny:production --file component/oai-spgwu-tiny/docker/Dockerfile.ubuntu18.04 component/oai-spgwu-tiny
+```
+```
+docker image prune --force
+```
+```
+docker image ls
+#OUTPUT
+oai-spgwu-tiny          production             588e14481f2b        1 minute ago          220MB
+...
+```
+ - Build Magma-MME
+ ```
+ cd ~
+ git clone https://github.com/magma/magma.git
+ cd magma
+ ```
+ ```
+ docker build --target magma-mme --tag magma-mme:master --file lte/gateway/docker/mme/Dockerfile.ubuntu18.04 .
+ docker image ls
+ # OUTPUT
+ magma-mme               nsa-support            b6fb01eb0d07        1 minute ago          492MB
+ ...
+ ```
+
+4. Run the [containers](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md).
+ - Initialize Cassandra DB
+ ```
+ cd ~/openair-epc-fed/docker-compose/magma-mme-demo
+ docker-compose up -d db_init
+
+ # OUTPUT:
+ Creating network "demo-oai-private-net" with the default driver
+ Creating network "demo-oai-public-net" with the default driver
+ Creating demo-cassandra ... done
+ Creating demo-db-init   ... done
+ ```
+ ```
+ docker logs demo-db-init --follow
+ # OUTPUT:
+ Connection error: ('Unable to connect to any servers', {'192.168.68.130': error(111, "Tried connecting to [('192.168.68.130', 9042)]. Last error: Connection refused")})
+ Connection error: ('Unable to connect to any servers', {'192.168.68.130': error(111, "Tried connecting to [('192.168.68.130', 9042)]. Last error: Connection refused")})
+ Connection error: ('Unable to connect to any servers', {'192.168.68.130': error(111, "Tried connecting to [('192.168.68.130', 9042)]. Last error: Connection refused")})
+ Connection error: ('Unable to connect to any servers', {'192.168.68.130': error(111, "Tried connecting to [('192.168.68.130', 9042)]. Last error: Connection refused")})
+ OK
+ ```
+ - Check cassandra log
+ ```
+ docker logs demo-cassandra
+ ```
+ Output should be have the following line at last. If no, execute ```docker-compose down``` and start again from cassandra.
+ ```
+ ....
+ INFO  20:19:40 Initializing vhss.extid_imsi_xref
+ ```
+ - Deploy rest of EPC
+ ```
+ docker-compose up -d oai_spgwu
+ ```
+ Output:
+ ```
+ demo-cassandra is up-to-date
+ Creating demo-redis   ... done
+ Creating demo-oai-hss ... done
+ Creating demo-magma-mme ... done
+ Creating demo-oai-spgwc ... done
+ Creating demo-oai-spgwu-tiny ... done
+ ```
+
+5. Finally, we need to set the ```MCC, MNC, TAC``` values in the ```mme.conf``` file in order to successfully connect to EnodeB. The values must match the ones stored in the EnodeB configuration file (mentioned above in RAN section). This [link](https://github.com/OPENAIRINTERFACE/openair-epc-fed/blob/master/docker-compose/magma-mme-demo/README.md#4-how-to-edit-the-docker-compose-file) provides more information for modifying the required parameters. 
+
 
 
 ### 3.2 Magma Core Network Setup
@@ -448,6 +611,8 @@ Setting up routes for RAN and Magma core is a bit challenging because the Access
 This step is similar to the previous one.
 ```
 sudo ip route add 192.168.60.0/24 via 192.168.2.171 dev eno1
+sudo sysctl net.ipv4.conf.all.forwarding=1
+sudo iptables -P FORWARD ACCEPT
 ```
 #### 4.2.2 Magma Core System
 ```
@@ -457,6 +622,8 @@ TODO: Add code
 #### 4.2.3 AGW virtual machine
 ```
 sudo ip route add 192.168.2.0/24 via 192.168.60.142 dev eth1
+sudo sysctl net.ipv4.conf.all.forwarding=1
+sudo iptables -P FORWARD ACCEPT
 ```
 
 **Note**: At last, we can ping each system to check if the route is working correctly or not.
