@@ -791,7 +791,7 @@ ping 192.168.61.149
 
 # Video Demonstration
 
-Coming Soon...
+[Video Link](https://www.youtube.com/watch?v=jAqJEjkI3eI)
 
 # Publication
 This work was presented as a DEMO paper titled _"Private Cellular Network Deployment: Comparison of OpenAirInterface with Magma Core"_ in CNSM 2022, Thessaloniki, Greece. Paper can be accessed from [here](https://www.researchgate.net/publication/365705123_Private_Cellular_Network_Deployment_Comparison_of_OpenAirInterface_with_Magma_Core).
