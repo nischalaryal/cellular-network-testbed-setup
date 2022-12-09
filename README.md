@@ -794,7 +794,7 @@ ping 192.168.61.149
 [Video Link](https://www.youtube.com/watch?v=jAqJEjkI3eI)
 
 # Publication
-This work was presented as a DEMO paper titled _"Private Cellular Network Deployment: Comparison of OpenAirInterface with Magma Core"_ in CNSM 2022, Thessaloniki, Greece. Paper can be accessed from [here](https://www.researchgate.net/publication/365705123_Private_Cellular_Network_Deployment_Comparison_of_OpenAirInterface_with_Magma_Core).
+This work was presented as a DEMO paper titled _"Private Cellular Network Deployment: Comparison of OpenAirInterface with Magma Core"_ in CNSM 2022, Thessaloniki, Greece. Paper can be accessed from [this link](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9964713&casa_token=evz-cpsK6xcAAAAA:nbavt4HH-9bHzuoQtepsRbZFy-TSjh8iXKfRoDVXifARMzOlMC-bbe37V5zuMCYuAsOs07WVXL6u) and [this link.](https://www.researchgate.net/publication/365705123_Private_Cellular_Network_Deployment_Comparison_of_OpenAirInterface_with_Magma_Core).
 
 # References
 - [OAI RAN](https://gitlab.eurecom.fr/oai/openairinterface5g/-/wikis/OpenAirSoftwareSupport)
