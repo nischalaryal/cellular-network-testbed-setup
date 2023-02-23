@@ -1,6 +1,6 @@
 # Please Note
 > **:warning:** 
->**This documentation can be used for setup, but I am constantly updating the documentation in another repository with much detail. If something is unclear here, please access the repository [nischalaryal/private-cellular-network-deployment-overall-documentation](nischalaryal/private-cellular-network-deployment-overall-documentation).**
+>**This documentation can be used for setup, but I am constantly updating the documentation in another repository with much detail. If something is unclear here, please access the repository [nischalaryal/private-cellular-network-deployment-overall-documentation](https://github.com/nischalaryal/private-cellular-network-deployment-overall-documentation).**
 # LTE Testbed setup Using OpenAirInterface and Magma Core
 In this repository, we have described the setup procedure we followed to setup an E2E LTE cellular network testbed using COTS UE, programmable SIM card, OpenAirInterface (for RAN and Core functionality), and Magma Core software. Configuration files have also been added to this repository for reference purposes.
 
